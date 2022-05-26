@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'Nanum-Gothic';
+    src: url("NanumGothic.otf") format('oepntype');
+}
+
+@font-face {
+    font-family: 'Nanum-Gothic-bold';
+    src: url("NanumGothicBold.otf") format('opentype');
+}

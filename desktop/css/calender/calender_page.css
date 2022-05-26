@@ -1,0 +1,222 @@
+body{
+    width: 1920px;
+    height: 100%;
+    margin: 0;
+    background-color: #FDFFFF;
+}
+
+header{
+    display: flex;
+    width: 1920px;
+    height: 150px;
+}
+
+#member_menu_space{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+}
+
+#member_menu_button{
+    width: 50px;
+    height: 50px;
+    background-color: #00000000;
+    border: 0;
+    visibility: hidden;
+}
+
+#name_space{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    height: 150px;
+    flex-grow: 0;
+}
+
+#name{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    height: 150px;
+    margin: 0;
+}
+
+#year_space, #month_space{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 250px;
+    height: 150px;
+    flex-grow: 0;
+}
+
+#year, #month{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 40px;
+    width: 100px;
+    height: 50px;
+    text-align: center;
+    font-family: 'Nanum-Gothic', sans-serif;
+    margin: 0;
+}
+
+.date_button{
+    width: fit-content;
+    height: fit-content;
+    background-color: #00000000;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+}
+#logout_space{
+    display: flex;
+    flex-grow: 1;
+    justify-content: end;
+}
+
+#logout_button{
+    width: 200px;
+    height: 150px;
+    background-color: #00000000;
+    font-size: 40px;
+    font-family: 'Nanum-Gothic', sans-serif;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+}
+
+#name{
+    font-size: 40px;
+    font-family: 'Nanum-Gothic', sans-serif;
+}
+
+/* 일정 추가란 */
+
+section{
+    width: 1920px;
+    height: 150px;
+    margin-bottom: 100px;
+}
+
+#new_schedule_input_form{
+    height: 150px;
+    border: 1px solid black;
+    margin: 0;
+}
+
+#input_datetime_and_add_button_space{
+    width: 1920px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+}
+
+#input_date, #input_time{
+    width: 400px;
+    height: 75px;
+    font-size: 40px;
+    font-family: 'Nanum-Gothic', sans-serif;
+    border: 1px solid black;
+    padding :0 ;
+}
+
+#input_add_button_space{
+    height: 75px;
+    display: flex;
+    justify-content: end;
+    flex-grow: 1;
+}
+
+#add_button{
+    width: 200px;
+    height: 75px;
+    background-color: #F82F62;
+    font-size: 40px;
+    font-family: 'Nanum-Gothic', sans-serif;
+    cursor: pointer;
+    padding :0;
+    border: 1px solid black;
+}
+
+#input_content{
+    width: 1920px;
+    height: 50px;
+    font-size: 30px;
+    font-family: 'Nanum-Gothic', sans-serif;
+    border : 1px solid black;
+}
+
+/* 일정 목록 */
+
+.schedule_form{
+    width: 1920px;
+    height: fit-content;
+    margin-bottom: 50px;
+}
+
+.schedule_day{
+    width: 100px;
+    height: 50px;
+    font-size: 30px;
+    font-family: 'Nanum-Gothic', sans-serif;
+    background-color: #F82F62;
+    margin: 0;
+}
+
+.schedule_content_text{
+    width: 1920px;
+    height: 50px;
+    font-size: 30px;
+    font-family: 'Nanum-Gothic', sans-serif;
+    border: 1px solid black;
+}
+
+.schedule_time{
+    width: 718px;
+    height: 48px;
+    font-size: 30px;
+    font-family: 'Nanum-Gothic', sans-serif;
+    margin: 0;
+    border: 1px solid black;
+}
+
+.modify_date_input, .modify_time_input{
+    width: 360px;
+    height: 50px;
+    font-size: 30px;
+    font-family: 'Nanum-Gothic', sans-serif;
+    display: none;
+}
+
+.schedule_time_and_buttons{
+    display: flex;
+    height: 50px;
+}
+
+.schedule_button{
+    width: 100px;
+    height: 50px;
+    font-size: 20px;
+    font-family: 'Nanum-Gothic-bold', sans-serif;
+    background-color: #F82F62;
+    padding: 0;
+    border : 1px solid black;
+    cursor: pointer;
+}
+
+.schedule_button_hidden{
+    width: 100px;
+    height: 50px;
+    font-size: 20px;
+    font-family: 'Nanum-Gothic-bold', sans-serif;
+    background-color: #F82F62;
+    padding: 0;
+    border : 1px solid black;
+    display: none;
+    cursor: pointer;
+}

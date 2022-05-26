@@ -1,0 +1,63 @@
+body{
+    width: 1920px;
+    height: 1080px;
+    margin : 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#join_form{
+    width: 1080px;
+    height: 720px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 0;
+}
+
+.join_input{
+    width: 1080px;
+    height: 50px;
+    padding: 0;
+    font-size : 30px;
+    font-family: 'Nanum-Gothic', sans-serif;
+}
+
+#duplicate_check_button_space{
+    display: flex;
+    justify-content: end;
+}
+
+#duplicate_check_button{
+    width: 150px;
+    height: 50px;
+    font-size: 30px;
+    background-color: #F82F62;
+    font-family: 'Nanum-Gothic-bold', sans-serif ;
+    cursor: pointer;
+}
+
+#pw_space{
+    display: flex;
+    flex-direction: column;
+}
+
+#password_same_check_p{
+    width: 1080px;
+    height: 50px;
+    margin: 0;
+    font-size: 30px;
+    font-family: 'Nanum-Gothic', sans-serif;
+}
+
+.join_button{
+    width: 1080px;
+    height: 100px;
+    padding: 0;
+    margin: 0;
+    background-color: #F82F62;
+    font-size : 40px;
+    font-family: 'Nanum-Gothic-bold', sans-serif;
+    cursor: pointer;
+}
