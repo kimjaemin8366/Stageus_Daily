@@ -214,6 +214,7 @@
         function show_schedule_list(user_data, schedule_data){
             var schedule_count = <%=schedule_count%>;
             var list = document.getElementsByTagName("article")[0];
+            var now_time = get_now_time();
             var last_written_day = "";
 
             for(var idx=0; idx<schedule_count; idx++){
@@ -254,7 +255,7 @@
                     last_written_day = day;
 
                     now_screen_year, now_screen_month, new_day_div
-                    new_form.append( make_content_div(idx, schedule_data[idx*4], schedule_data[idx*4+1]), make_bottom_div(idx, schedule_time, datetime[0],datetime[1]));
+                    new_form.append( make_content_div(idx, schedule_data[idx*4], schedule_data[idx*4+1], schedule_data[idx*4+2], now_time), make_bottom_div(idx, schedule_time, datetime[0],datetime[1]));
                     new_schedule_div.append(now_screen_year, now_screen_month, new_day_div, new_form)
                     list.appendChild(new_schedule_div);
                 }
@@ -263,7 +264,7 @@
                     var new_form = document.createElement("form");
                     new_form.className="schedule_form";
                     new_form.setAttribute("action", "delete_schedule.jsp");
-                    new_form.append(make_content_div(idx, schedule_data[idx*4], schedule_data[idx*4+1]), make_bottom_div(idx, schedule_time, datetime[0],datetime[1]))
+                    new_form.append(make_content_div(idx, schedule_data[idx*4], schedule_data[idx*4+1], schedule_data[idx*4+2], now_time), make_bottom_div(idx, schedule_time, datetime[0],datetime[1]))
                     day_div.append(new_form);
                 }
             }
@@ -271,8 +272,25 @@
 
         // 내용 div
 
-        function make_content_div(idx, content_id, content){
-            
+        function get_now_time(){
+            var date = new Date();
+            var year = date.getFullYear();
+            var month = ('0'+(date.getMonth()+1)).slice(-2);
+            var day = ('0'+date.getDate()).slice(-2);
+            var hour = ('0'+date.getHours()).slice(-2);
+            var minute = ('0'+date.getMinutes()).slice(-2);
+            var now = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":00";
+            return now;
+        }
+
+        function check_strikethrough(text_space, now_time, schedule_time){
+            if(now_time > schedule_time){
+                text_space.style.textDecorationLine = "line-through";
+            }
+        }
+
+        function make_content_div(idx, content_id, content, schedule_time, now_time){
+
             var new_content_div = document.createElement("div");
             var new_content_input = document.createElement("input");
             new_content_input.type = "text";
@@ -280,6 +298,8 @@
             new_content_input.name = "schedule_content";
             new_content_input.setAttribute("disabled", true);
             new_content_input.value = content;
+            check_strikethrough(new_content_input, now_time, schedule_time);
+            
             var new_content_before_modified = document.createElement("input");
             new_content_before_modified.type ="hidden";
             new_content_before_modified.className="before_modified_content";
@@ -358,7 +378,7 @@
             modify_cancel_button.type = "button";
             modify_cancel_button.value = "수정 취소";
             modify_cancel_button.addEventListener("click", function(){
-                modify_cancel_event(idx);
+                modify_cancel_event(idx, date + " " + time);
             })
             
             new_bottom_div.append(new_time_p, new_modify_date_input, new_modify_time_input, date_before_modified, time_before_modified, modify_button, delete_button, modify_done_button, modify_cancel_button);
@@ -369,31 +389,42 @@
             var date = document.getElementsByClassName("before_modified_date")[idx].value;
             var time = document.getElementsByClassName("before_modified_time")[idx].value;
 
+            // 버튼 사라지기 처리
             document.getElementsByClassName("modify_schedule_button")[idx].style.display = "none";
             document.getElementsByClassName("delete_schedule_button")[idx].style.display = "none";
             document.getElementsByClassName("schedule_time")[idx].style.display = "none";
+
+            // 버튼 등장 처리
             document.getElementsByClassName("confirm_modify_button")[idx].style.display = "inline";
             document.getElementsByClassName("modify_cancel_button")[idx].style.display = "inline";
+
+            // 날짜,시간 수정란 
             document.getElementsByClassName("modify_date_input")[idx].style.display = "inline";
             document.getElementsByClassName("modify_date_input")[idx].value = date;
             document.getElementsByClassName("modify_time_input")[idx].style.display = "inline";
             document.getElementsByClassName("modify_time_input")[idx].value = time;
+
+            // 취소선 제거 처리, 수정칸 수정 가능하게
+            document.getElementsByClassName("schedule_content_text")[idx].style.textDecorationLine = "none";
             document.getElementsByClassName("schedule_content_text")[idx].removeAttribute("disabled");
 
             document.getElementsByClassName("schedule_form")[idx].setAttribute("action", "modify_schedule.jsp");
         }
 
-        function modify_cancel_event(idx){
+        function modify_cancel_event(idx, schedule_time){
             var content = document.getElementsByClassName("before_modified_content")[idx].value;
             var date = document.getElementsByClassName("before_modified_date")[idx].value;
             var time = document.getElementsByClassName("before_modified_time")[idx].value.split(":");
             var hour = time[0]
             var minute = time[1];
 
+            // 버튼 등장 처리
+
             document.getElementsByClassName("modify_schedule_button")[idx].style.display = "inline";
             document.getElementsByClassName("delete_schedule_button")[idx].style.display = "inline";
             document.getElementsByClassName("schedule_time")[idx].style.display = "block";
             
+            // 시간 원래 내용 출력
             if(hour<=12){
                 document.getElementsByClassName("schedule_time")[idx].innerHTML = "오전 " + hour + ":" + minute;
             }else{
@@ -401,13 +432,19 @@
             }
 
 
+            // 버튼 사라지기 처리
             document.getElementsByClassName("confirm_modify_button")[idx].style.display = "none";
             document.getElementsByClassName("modify_cancel_button")[idx].style.display = "none";
             document.getElementsByClassName("modify_date_input")[idx].style.display = "none";
             document.getElementsByClassName("modify_time_input")[idx].style.display = "none";
-            document.getElementsByClassName("schedule_content_text")[idx].value = content;
-            document.getElementsByClassName("schedule_content_text")[idx].setAttribute("disabled", true);
 
+            // 내용란 원 상태로 돌리기
+            text_space = document.getElementsByClassName("schedule_content_text")[idx];
+            text_space.value = content;
+            text_space.setAttribute("disabled", true);
+
+            // 취소선 처리
+            check_strikethrough(text_space, get_now_time(), schedule_time);
 
             document.getElementsByClassName("schedule_form")[idx].setAttribute("action", "delete_schedule.jsp");
         }
