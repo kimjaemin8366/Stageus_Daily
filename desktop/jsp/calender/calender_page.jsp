@@ -241,11 +241,10 @@
                     var new_schedule_div = document.createElement("div");
                     new_schedule_div.className="schedule";
                     new_schedule_div.id = day;
-                    new_schedule_div.setAttribute("action", "modify_schedule.jsp");
 
                     var new_form = document.createElement("form");
                     new_form.className="schedule_form";
-                    new_form.setAttribute("action", "modify_schedule.jsp");
+                    new_form.setAttribute("action", "delete_schedule.jsp");
 
                     var new_day_div = document.createElement("div");
                     var new_day_p =document.createElement("p");
@@ -263,7 +262,7 @@
                     var day_div = document.getElementById(""+day);
                     var new_form = document.createElement("form");
                     new_form.className="schedule_form";
-                    new_form.setAttribute("action", "modify_schedule.jsp");
+                    new_form.setAttribute("action", "delete_schedule.jsp");
                     new_form.append(make_content_div(idx, schedule_data[idx*4], schedule_data[idx*4+1]), make_bottom_div(idx, schedule_time, datetime[0],datetime[1]))
                     day_div.append(new_form);
                 }
@@ -293,11 +292,11 @@
             var now_screen_year = document.createElement("input");
             now_screen_year.type = "hidden";
             now_screen_year.name = "now_screen_year";
-            now_screen_year.value = <%=year%>
+            now_screen_year.value = <%=year%>;
             var now_screen_month = document.createElement("input");
             now_screen_month.type = "hidden";
             now_screen_month.name = "now_screen_month";
-            now_screen_month.value = <%=month%>
+            now_screen_month.value = <%=month%>;
             new_content_div.append(now_screen_year, now_screen_month, new_content_input, new_content_before_modified, new_content_id);
             return new_content_div;
         }
