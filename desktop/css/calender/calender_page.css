@@ -5,6 +5,12 @@ body{
     background-color: #FDFFFF;
 }
 
+input:disabled{
+    background : #FDFFFF;
+    color : #000000;
+    
+}
+
 header{
     display: flex;
     width: 1920px;
@@ -153,10 +159,14 @@ section{
 
 /* 일정 목록 */
 
+.schedule{
+    margin-bottom: 50px;
+}
+
 .schedule_form{
     width: 1920px;
     height: fit-content;
-    margin-bottom: 50px;
+    margin-bottom:0;
 }
 
 .schedule_day{
@@ -198,7 +208,7 @@ section{
     height: 50px;
 }
 
-.schedule_button{
+.modify_schedule_button, .delete_schedule_button{
     width: 100px;
     height: 50px;
     font-size: 20px;
@@ -209,7 +219,7 @@ section{
     cursor: pointer;
 }
 
-.schedule_button_hidden{
+.confirm_modify_button, .modify_cancel_button{
     width: 100px;
     height: 50px;
     font-size: 20px;

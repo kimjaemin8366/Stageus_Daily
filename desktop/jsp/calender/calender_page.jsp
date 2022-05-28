@@ -5,12 +5,13 @@
 <%@ page import="java.sql.PreparedStatement" %> 
 <%@ page import="java.sql.ResultSet" %> 
 <%@ page import="java.util.Vector" %>
+<%@page import = "java.util.Enumeration"%>
 
 <%
     String id = (String) session.getAttribute("logged_id");
     Boolean logged = false;
 
-    if(id==""){
+    if(id=="" || id==null){
         response.sendRedirect("../login/login_page.jsp");
     }
 
@@ -41,7 +42,7 @@
     String compare_start_date = year + "-" + month + "-01";
     String compare_last_date = year + "-" + month + "-31"; 
 
-    String schedule_sql = "SELECT schedule_content, schedule_datetime, user_id FROM schedule WHERE schedule_datetime >= ? AND schedule_datetime <= ? AND user_id=? ORDER BY schedule_datetime";
+    String schedule_sql = "SELECT * FROM schedule WHERE schedule_datetime >= ? AND schedule_datetime <= ? AND user_id=? ORDER BY schedule_datetime";
     PreparedStatement schedule_query = connect.prepareStatement(schedule_sql);
     schedule_query.setString(1, compare_start_date);
     schedule_query.setString(2, compare_last_date);
@@ -52,12 +53,13 @@
     Vector<String> schedule_data = new Vector<String>();
     int schedule_count = 0;
     while(schedule_result.next()){
-        for(int idx=1; idx<=3; idx++){
+        for(int idx=1; idx<=4; idx++){
             schedule_data.add(schedule_result.getString(idx));
             
         }
         schedule_count++;
     }
+
 %>
 <head>
     <link rel="stylesheet" type="text/css" href="../../css/font/font.css">
@@ -116,22 +118,23 @@
     </section>
 
     <article>
-        <!-- <form id="8" class="schedule_form" action="modify_schedule.jsp">
+        <!-- <form id="8" class="schedule_form" action="modify_schedule.jsp" onsubmit="before_modify_schedule_input()">
             <div>
                 <p class="schedule_day">8일</p>
             </div>
             <div>
-                <input class="schedule_content_text" type="text" value="놀기" readonly>
+                <input class="schedule_content_text" type="text" value="놀기" disabled>
+                <input class="schedule_content_id" type="hidden" name="content_id">
                 <input class="before_modified_content" type="hidden">
             </div>
             <div class="schedule_time_and_buttons">
-                <p class="schedule_time">오전 10:30</p>
-                <input class="modify_date_input" type="date" name="modified_schedule_date">
+                <p class="schedule_time">오후 1:30</p>
+                <input class="modify_date_input" type="date" name="modified_schedule_date"> 
                 <input class="modify_time_input" type="time" name="modified_schedule_time">
                 <input class="before_modified_date" type="hidden">
                 <input class="before_modified_time" type="hidden">
-                <input class="schedule_button" type="button" value="일정 수정">
-                <input class="schedule_button" type="button" value="일정 삭제">
+                <input class="schedule_button" type="button" value="일정 수정" onclick="modify_ready()">
+                <input class="schedule_button" type="submit" value="일정 삭제">
                 <input class="schedule_button_hidden" type="submit" value="수정 확인">
                 <input class="schedule_button_hidden" type="button" value="수정 취소">
             </div>
@@ -185,6 +188,8 @@
 
         }
 
+        // 전체 화면 틀
+
         function make_screen(){
             var user_string = "<%=user_data%>";
             var schedule_string = "<%=schedule_data%>";
@@ -202,10 +207,9 @@
             }
 
             show_schedule_list(user_data, schedule_data);
-
-            console.log(user_data);
-            console.log("<%=schedule_data%>");
         }
+
+        // 일자별 설계
 
         function show_schedule_list(user_data, schedule_data){
             var schedule_count = <%=schedule_count%>;
@@ -213,23 +217,34 @@
             var last_written_day = "";
 
             for(var idx=0; idx<schedule_count; idx++){
-                var datetime = schedule_data[idx*3+1].split(" ");
-                var day = datetime[0].split("-")[2];
+                var datetime = schedule_data[idx*4+2].split(" ");
+
+                var date = datetime[0].split("-");
+                var year = date[0];
+                var month = parseInt(date[1]);
+                var day = date[2];
+
                 var time = datetime[1].split(":");
                 var hour = parseInt(time[0]);
                 var minute = time[1];
 
                 var schedule_time = "";
-                if(hour<=12){
+                if(hour>12){
+                    schedule_time = "오후 "+(hour-12)+":"+minute;
+                }else if(hour>0){
                     schedule_time = "오전 "+hour+":"+minute;
                 }else{
-                    schedule_time = "오후 "+(hour-12)+":"+minute;
+                    schedule_time = "오전 "+12+":"+minute;
                 }
 
                 if(last_written_day!=day){
+                    var new_schedule_div = document.createElement("div");
+                    new_schedule_div.className="schedule";
+                    new_schedule_div.id = day;
+                    new_schedule_div.setAttribute("action", "modify_schedule.jsp");
+
                     var new_form = document.createElement("form");
                     new_form.className="schedule_form";
-                    new_form.id = day;
                     new_form.setAttribute("action", "modify_schedule.jsp");
 
                     var new_day_div = document.createElement("div");
@@ -239,48 +254,77 @@
                     new_day_div.appendChild(new_day_p);
                     last_written_day = day;
 
-                    new_form.append(new_day_div, make_content_div(schedule_data[idx*3]), make_bottom_div(schedule_time, datetime[0],datetime[1]));
-                    list.appendChild(new_form);
+                    now_screen_year, now_screen_month, new_day_div
+                    new_form.append( make_content_div(idx, schedule_data[idx*4], schedule_data[idx*4+1]), make_bottom_div(idx, schedule_time, datetime[0],datetime[1]));
+                    new_schedule_div.append(now_screen_year, now_screen_month, new_day_div, new_form)
+                    list.appendChild(new_schedule_div);
                 }
                 else{
-                    var day_form = document.getElementById(""+day);
-                    day_form.append(make_content_div(schedule_data[idx*3]), make_bottom_div(schedule_time, datetime[0],datetime[1]));
+                    var day_div = document.getElementById(""+day);
+                    var new_form = document.createElement("form");
+                    new_form.className="schedule_form";
+                    new_form.setAttribute("action", "modify_schedule.jsp");
+                    new_form.append(make_content_div(idx, schedule_data[idx*4], schedule_data[idx*4+1]), make_bottom_div(idx, schedule_time, datetime[0],datetime[1]))
+                    day_div.append(new_form);
                 }
             }
         }
 
-        function make_content_div(content){
+        // 내용 div
+
+        function make_content_div(idx, content_id, content){
             
             var new_content_div = document.createElement("div");
             var new_content_input = document.createElement("input");
             new_content_input.type = "text";
             new_content_input.className = "schedule_content_text";
+            new_content_input.name = "schedule_content";
+            new_content_input.setAttribute("disabled", true);
             new_content_input.value = content;
             var new_content_before_modified = document.createElement("input");
             new_content_before_modified.type ="hidden";
             new_content_before_modified.className="before_modified_content";
             new_content_before_modified.value = content;
+            var new_content_id = document.createElement("input");
+            new_content_id.type ="hidden";
+            new_content_id.name = "schedule_id";
+            new_content_id.value = content_id;
 
-            new_content_div.append(new_content_input, new_content_before_modified);
+            var now_screen_year = document.createElement("input");
+            now_screen_year.type = "hidden";
+            now_screen_year.name = "now_screen_year";
+            now_screen_year.value = <%=year%>
+            var now_screen_month = document.createElement("input");
+            now_screen_month.type = "hidden";
+            now_screen_month.name = "now_screen_month";
+            now_screen_month.value = <%=month%>
+            new_content_div.append(now_screen_year, now_screen_month, new_content_input, new_content_before_modified, new_content_id);
             return new_content_div;
         }
 
-        function make_bottom_div(schedule_time, date,time){
+        // 시간 + 버튼 div
+
+        function make_bottom_div(idx, schedule_time, date, time){
 
             var new_bottom_div = document.createElement("div");
             new_bottom_div.className = "schedule_time_and_buttons";
-            
+
+            // 시간 div
             var new_time_p = document.createElement("p");
             new_time_p.className= "schedule_time";
             new_time_p.innerHTML = schedule_time;
+
+            // 수정 input form
             var new_modify_date_input = document.createElement("input");
             new_modify_date_input.className="modify_date_input";
             new_modify_date_input.type = "date";
             new_modify_date_input.name = "modified_schedule_date";
             var new_modify_time_input = document.createElement("input");
             new_modify_time_input.className="modify_time_input";
-            new_modify_time_input.type = "date";
+            new_modify_time_input.type = "time";
             new_modify_time_input.name = "modified_schedule_time";
+
+            // 수정 전 날짜와 시간
             var date_before_modified = document.createElement("input");
             date_before_modified.className="before_modified_date";
             date_before_modified.type = "hidden";
@@ -289,26 +333,87 @@
             time_before_modified.className="before_modified_time";
             time_before_modified.type = "hidden";
             time_before_modified.value = time;
+
+
+            // 수정, 삭제 관련 버튼
             var modify_button = document.createElement("input");
-            modify_button.className="schedule_button";
+            modify_button.className="modify_schedule_button";
+            modify_button.id = "modify_ready_button";
             modify_button.type = "button";
             modify_button.value = "일정 수정";
+            modify_button.addEventListener("click", function(){
+                modify_ready_event(idx);
+            })
+
             var delete_button = document.createElement("input");
-            delete_button.className="schedule_button";
-            delete_button.type = "button";
+            delete_button.className="delete_schedule_button";
+            delete_button.type = "submit";
             delete_button.value = "일정 삭제";
+
             var modify_done_button = document.createElement("input");
-            modify_done_button.className="schedule_button_hidden";
+            modify_done_button.className="confirm_modify_button";
             modify_done_button.type = "submit";
             modify_done_button.value = "수정 확인";
             var modify_cancel_button = document.createElement("input");
-            modify_cancel_button.className="schedule_button_hidden";
+            modify_cancel_button.className="modify_cancel_button";
             modify_cancel_button.type = "button";
             modify_cancel_button.value = "수정 취소";
+            modify_cancel_button.addEventListener("click", function(){
+                modify_cancel_event(idx);
+            })
             
             new_bottom_div.append(new_time_p, new_modify_date_input, new_modify_time_input, date_before_modified, time_before_modified, modify_button, delete_button, modify_done_button, modify_cancel_button);
             return new_bottom_div;
         }
+
+        function modify_ready_event(idx){
+            var date = document.getElementsByClassName("before_modified_date")[idx].value;
+            var time = document.getElementsByClassName("before_modified_time")[idx].value;
+
+            document.getElementsByClassName("modify_schedule_button")[idx].style.display = "none";
+            document.getElementsByClassName("delete_schedule_button")[idx].style.display = "none";
+            document.getElementsByClassName("schedule_time")[idx].style.display = "none";
+            document.getElementsByClassName("confirm_modify_button")[idx].style.display = "inline";
+            document.getElementsByClassName("modify_cancel_button")[idx].style.display = "inline";
+            document.getElementsByClassName("modify_date_input")[idx].style.display = "inline";
+            document.getElementsByClassName("modify_date_input")[idx].value = date;
+            document.getElementsByClassName("modify_time_input")[idx].style.display = "inline";
+            document.getElementsByClassName("modify_time_input")[idx].value = time;
+            document.getElementsByClassName("schedule_content_text")[idx].removeAttribute("disabled");
+
+            document.getElementsByClassName("schedule_form")[idx].setAttribute("action", "modify_schedule.jsp");
+        }
+
+        function modify_cancel_event(idx){
+            var content = document.getElementsByClassName("before_modified_content")[idx].value;
+            var date = document.getElementsByClassName("before_modified_date")[idx].value;
+            var time = document.getElementsByClassName("before_modified_time")[idx].value.split(":");
+            var hour = time[0]
+            var minute = time[1];
+
+            document.getElementsByClassName("modify_schedule_button")[idx].style.display = "inline";
+            document.getElementsByClassName("delete_schedule_button")[idx].style.display = "inline";
+            document.getElementsByClassName("schedule_time")[idx].style.display = "block";
+            
+            if(hour<=12){
+                document.getElementsByClassName("schedule_time")[idx].innerHTML = "오전 " + hour + ":" + minute;
+            }else{
+                document.getElementsByClassName("schedule_time")[idx].innerHTML = "오후 " + hour + ":" + minute;
+            }
+
+
+            document.getElementsByClassName("confirm_modify_button")[idx].style.display = "none";
+            document.getElementsByClassName("modify_cancel_button")[idx].style.display = "none";
+            document.getElementsByClassName("modify_date_input")[idx].style.display = "none";
+            document.getElementsByClassName("modify_time_input")[idx].style.display = "none";
+            document.getElementsByClassName("schedule_content_text")[idx].value = content;
+            document.getElementsByClassName("schedule_content_text")[idx].setAttribute("disabled", true);
+
+
+            document.getElementsByClassName("schedule_form")[idx].setAttribute("action", "delete_schedule.jsp");
+        }
+
+
         window.onload=function(){
             make_screen();
         }

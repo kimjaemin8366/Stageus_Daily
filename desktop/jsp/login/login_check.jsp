@@ -30,19 +30,22 @@
         String department = result.getString("department");
         String position =  result.getString("position");
 
-        Cookie cookie_user_id = new Cookie("logged_id", input_id);
-        cookie_user_id.setPath("/desktop/jsp/calender");
-        Cookie cookie_name = new Cookie("name", name);
-        cookie_name.setPath("/desktop/jsp/calender");
-        Cookie cookie_department = new Cookie("department", department);
-        cookie_department.setPath("/desktop/jsp/calender");
-        Cookie cookie_position = new Cookie("position", position);
-        cookie_position.setPath("/desktop/jsp/calender");
+        session.setAttribute("name", name);
+        session.setAttribute("department",department);
+        session.setAttribute("position", position);
 
-        response.addCookie(cookie_user_id);
-        response.addCookie(cookie_name);
-        response.addCookie(cookie_department);
-        response.addCookie(cookie_position);
+
+        Cookie cookie_schedule_owner = new Cookie("schedule_owner", input_id);
+        cookie_schedule_owner.setPath("/desktop/jsp/calender");
+//        Cookie cookie_department = new Cookie("department", department);
+//        cookie_department.setPath("/desktop/jsp/calender");
+//        Cookie cookie_position = new Cookie("position", position);
+//        cookie_position.setPath("/desktop/jsp/calender");
+
+        response.addCookie(cookie_schedule_owner);
+//        response.addCookie(cookie_name);
+//        response.addCookie(cookie_department);
+//        response.addCookie(cookie_position);
     }
 %>
 

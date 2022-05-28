@@ -61,7 +61,7 @@
         function use_this_id(){
             opener.document.join_form.check_duplication.value= "Check";
             opener.document.join_form.input_id.value= "<%=id%>";
-            opener.document.join_form.input_id.setAttribute("readonly", true);
+            opener.document.join_form.input_id.setAttribute("disabled", true);
             self.close();
         }
 
