@@ -6,9 +6,9 @@
 <%@ page import="java.sql.ResultSet" %> 
 
 <%
-    String id = (String) session.getAttribute("logged_id");
+    String logged_id = (String) session.getAttribute("logged_id");
 
-    if(id==""){
+    if(logged_id=="" || logged_id=null){
         response.sendRedirect("../login/login_page.jsp");
     }
     
@@ -27,7 +27,7 @@
     PreparedStatement query = connect.prepareStatement(sql);
     query.setString(1, content);
     query.setString(2, datetime);
-    query.setString(3, id);
+    query.setString(3, logged_id);
 
     query.executeUpdate();
 

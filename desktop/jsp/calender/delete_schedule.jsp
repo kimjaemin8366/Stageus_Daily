@@ -6,9 +6,9 @@
 <%@ page import="java.sql.ResultSet" %> 
 
 <%
-    String id = (String) session.getAttribute("logged_id");
+    String logged_id = (String) session.getAttribute("logged_id");
 
-    if(id=="" || id==null){
+    if(logged_id=="" || logged_id==null){
         response.sendRedirect("../login/login_page.jsp");
     }
     
@@ -19,6 +19,20 @@
 
     Class.forName("com.mysql.jdbc.Driver");
     Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/calender","Stageus","8366");
+
+    // 권한이 있는 사람이 삭제했는지 체크
+    String user_sql = "SELECT user_id FROM schedule WHERE schedule_id = ?";
+    PreparedStatement user_query = connect.prepareStatement(user_sql);
+    user_query.setString(1, schedule_id);
+
+    ResultSet result = user_query.executeQuery();
+    if(result.next()){
+        if(logged_id.equals(result.getString(1))){
+            response.SendRedirect("./no_auth_alert_page.jsp");
+        }
+    }
+
+    // 삭제 과정
     
     String sql = "DELETE FROM schedule WHERE schedule_id = ?";
     PreparedStatement query = connect.prepareStatement(sql);
@@ -30,6 +44,6 @@
 
 <body>
     <script>
-        location.href="./calender_page.jsp?user_id=<%=id%>&year=<%=screen_year%>&month=<%=screen_month%>";
+        location.href="./calender_page.jsp?user_id=<%=logged_id%>&year=<%=screen_year%>&month=<%=screen_month%>";
     </script>
 </body>

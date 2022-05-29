@@ -8,20 +8,27 @@
 <%@page import = "java.util.Enumeration"%>
 
 <%
-    String id = (String) session.getAttribute("logged_id");
+    String logged_id = (String) session.getAttribute("logged_id");
+    String logged_position = (String) session.getAttribute("position");
     Boolean logged = false;
 
-    if(id=="" || id==null){
+    if(logged_id=="" || logged_id==null){
         response.sendRedirect("../login/login_page.jsp");
     }
 
-    String user_id = request.getParameter("user_id");
+    String user_id = (String) request.getParameter("user_id");
+        
+    // 타인 일정 페이지 접속 권한
+
+    if(!user_id.equals(logged_id) && logged_position.equals("사원") ){
+        response.sendRedirect("./no_auth_alert_page.jsp");
+    }
     
     Class.forName("com.mysql.jdbc.Driver");
     Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/calender","Stageus","8366");
-    
+
     // 사용자 정보
-    String user_sql = "SELECT user_id, name, department, position FROM users WHERE user_id = ?";
+    String user_sql = "SELECT user_id, name FROM users WHERE user_id = ?";
     PreparedStatement user_query = connect.prepareStatement(user_sql);
     user_query.setString(1, user_id);
 
@@ -30,10 +37,27 @@
     Vector<String> user_data = new Vector<String>();
     
     while(user_result.next()){
-        for(int idx=1; idx<=4; idx++){
+        for(int idx=1; idx<=2; idx++){
             user_data.add(user_result.getString(idx));
         }
     }
+
+
+    // 메뉴 목록을 위한 사용자 목록
+
+    String user_list_sql = "SELECT user_id, name FROM users ORDER BY name";
+    PreparedStatement user_list_query = connect.prepareStatement(user_list_sql);
+    
+    ResultSet user_list_result = user_list_query.executeQuery();
+    Vector<String> user_list_data = new Vector<String>();
+    int user_count = 0;
+    while(user_list_result.next()){
+        for(int idx=1; idx<=2; idx++){
+            user_list_data.add(user_list_result.getString(idx));
+        }
+        user_count += 1;
+    }
+
 
     // 사용자 일정 정보
 
@@ -69,7 +93,7 @@
 <body>
     <header>
         <div id="member_menu_space">
-            <button id="member_menu_button" type="button">
+            <button id="member_menu_button" type="button" onclick="open_menu()">
                 <img src="../../../source/member_menu.png">
             </button>
         </div>
@@ -98,6 +122,21 @@
             </button>
         </div>
     </header>
+    <nav>
+        <div id="nav_member_list">
+            <div id="nav_member_menu_space">
+                <button id="nav_member_menu_button" type="button" onclick="close_menu()">
+                    <img src="../../../source/member_menu.png">
+                </button>
+            </div>
+            <!-- <p id="이름" onclick="location.href=''">
+                
+            </p> -->
+        </div>
+        <div id="nav_background" onclick="close_menu()">
+
+        </div>
+    </nav>
     <section>
         <form id="new_schedule_input_form" action="input_schedule.jsp" onsubmit="before_new_schedule_input()">
             <input type="hidden" id="now_screen_year" name="now_screen_year">
@@ -143,6 +182,7 @@
     </article>
     <script>
 
+        // 연도, 월 이동
         function move_date(id){
             if(id=="year_back"){
                 location.href="./calender_page.jsp?user_id=<%=user_id%>&year=" + (parseInt("<%=year%>")-1) + "&month=<%=month%>";
@@ -166,6 +206,7 @@
             }
         }
 
+        // 일정 추가 검사
         function before_new_schedule_input(){
             var date = document.getElementById("input_date").value;
             var time = document.getElementById("input_time").value;
@@ -195,14 +236,19 @@
             var schedule_string = "<%=schedule_data%>";
             var user_data = user_string.substring(1, user_string.length-1).split(", ");
             var schedule_data = schedule_string.substring(1, schedule_string.length-1).split(", ");
+            var logged_position = "<%=logged_position%>";
 
+            // 헤더 내용
             document.getElementById("now_screen_year").value = "<%=year%>";   
-            document.getElementById("now_screen_month").value = "<%=month%>";   
+            document.getElementById("now_screen_month").value = "<%=month%>";
             document.getElementById("year").innerHTML = "<%=year%>";
             document.getElementById("month").innerHTML = "<%=month%>"+"월";
             document.getElementById("name").innerHTML = user_data[1];
 
-            if(user_data[3]=="부장" || user_data[3] =="관리자"){
+            console.log(logged_position);
+
+            //회원 메뉴 보여주기 여부
+            if(logged_position=="부장" || logged_position =="관리자"){
                 document.getElementById("member_menu_button").style.visibility = "visible";
             }
 
@@ -238,6 +284,7 @@
                     schedule_time = "오전 "+12+":"+minute;
                 }
 
+
                 if(last_written_day!=day){
                     var new_schedule_div = document.createElement("div");
                     new_schedule_div.className="schedule";
@@ -258,7 +305,7 @@
                     new_form.append( make_content_div(idx, schedule_data[idx*4], schedule_data[idx*4+1], schedule_data[idx*4+2], now_time), make_bottom_div(idx, schedule_time, datetime[0],datetime[1]));
                     new_schedule_div.append(now_screen_year, now_screen_month, new_day_div, new_form)
                     list.appendChild(new_schedule_div);
-                }
+                }  // 새 일자
                 else{
                     var day_div = document.getElementById(""+day);
                     var new_form = document.createElement("form");
@@ -266,12 +313,51 @@
                     new_form.setAttribute("action", "delete_schedule.jsp");
                     new_form.append(make_content_div(idx, schedule_data[idx*4], schedule_data[idx*4+1], schedule_data[idx*4+2], now_time), make_bottom_div(idx, schedule_time, datetime[0],datetime[1]))
                     day_div.append(new_form);
-                }
+                } // 하나 일자 여러 일정
             }
         }
 
+        
+        // 메뉴 목록 
+        function make_members_menu(){
+            var members_string = "<%=user_list_data%>";
+            var members_list = members_string.substring(1, members_string.length-1).split(", ");
+            var member_count = <%=user_count%>;
+            var list_div = document.getElementById("nav_member_list");
+
+            for(var idx=0; idx<member_count; idx++){
+                var new_member_link = document.createElement("p");
+                member_name = members_list[idx*2+1];
+                member_id = members_list[idx*2];
+                new_member_link.innerHTML = member_name;
+                new_member_link.className = "member_link";
+                list_div.appendChild(new_member_link);
+
+                move_to_member_schedule(member_id, idx);
+            }
+        }
+
+        function move_to_member_schedule(member_id, idx){
+            var member_link = document.getElementsByClassName("member_link")[idx];
+            member_link.addEventListener("click", function(){
+                location.href="./calender_page.jsp?user_id="+ member_id + "&year=<%=year%>&month=<%=month%>";       
+            })
+        }
+        
+
+        function open_menu(){
+            document.getElementsByTagName("nav")[0].style.visibility = "visible";
+        }
+
+        function close_menu(){
+            document.getElementsByTagName("nav")[0].style.visibility = "hidden";
+        }
+
+
         // 내용 div
 
+
+        //현재 시간 가져오기
         function get_now_time(){
             var date = new Date();
             var year = date.getFullYear();
@@ -283,12 +369,15 @@
             return now;
         }
 
+
+        //취소선 함수
         function check_strikethrough(text_space, now_time, schedule_time){
             if(now_time > schedule_time){
                 text_space.style.textDecorationLine = "line-through";
             }
         }
 
+        // 각 일자별 내용
         function make_content_div(idx, content_id, content, schedule_time, now_time){
 
             var new_content_div = document.createElement("div");
@@ -322,7 +411,6 @@
         }
 
         // 시간 + 버튼 div
-
         function make_bottom_div(idx, schedule_time, date, time){
 
             var new_bottom_div = document.createElement("div");
@@ -449,9 +537,29 @@
             document.getElementsByClassName("schedule_form")[idx].setAttribute("action", "delete_schedule.jsp");
         }
 
+        //일정 추가
+
+        function if_another_user_schedule(){
+            if("<%=logged_id%>"=="<%=user_id%>"){
+                document.getElementsByTagName("section")[0].style.display = "block";
+            }
+        }
+
+        // 권한이 없는 사람이 다른 사람의 일정 페이지를 갈 경우
+        // function can_enter_schedule(){
+        //     if(("<%=logged_id%>"!="<%=user_id%>") && ("<%=logged_position%>"=="사원")){
+        //         location.href="./no_auth_alert_page.jsp";
+        //     }
+        // }
 
         window.onload=function(){
+            // can_enter_schedule();
             make_screen();
+            make_members_menu();
+            if_another_user_schedule();
+        
+            console.log("<%=user_id%>");
+        
         }
     </script>
 </body>
