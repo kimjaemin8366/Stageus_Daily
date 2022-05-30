@@ -1,5 +1,5 @@
 body{
-    width: 1920px;
+    width: 100%;
     height: 100%;
     margin: 0;
     background-color: #FDFFFF;
@@ -13,7 +13,7 @@ input:disabled{
 
 header{
     display: flex;
-    width: 1920px;
+    width: 100%;
     height: 150px;
     border-bottom: 1px solid black;
 }
@@ -25,12 +25,16 @@ header{
     width: 100px;
 }
 
-#member_menu_button{
+#menu_img{
     width: 50px;
     height: 50px;
+}
+
+#member_menu_button{
+    width: fit-content;
+    height: fit-content;
     background-color: #00000000;
     border: 0;
-    visibility: hidden;
     cursor: pointer;
 }
 
@@ -39,7 +43,7 @@ header{
     justify-content: center;
     align-items: center;
     width: 200px;
-    height: 150px;
+    height: 100%;
     flex-grow: 0;
 }
 
@@ -48,7 +52,7 @@ header{
     align-items: center;
     justify-content: center;
     width: 200px;
-    height: 150px;
+    height: 100%;
     margin: 0;
 }
 
@@ -57,8 +61,7 @@ header{
     justify-content: center;
     align-items: center;
     width: 250px;
-    height: 150px;
-    flex-grow: 0;
+    height: 100%;
 }
 
 #year, #month{
@@ -81,6 +84,12 @@ header{
     padding: 0;
     cursor: pointer;
 }
+
+.date_button_img{
+    width: 23px;
+    height: 44px;
+}
+
 #logout_space{
     display: flex;
     flex-grow: 1;
@@ -89,13 +98,17 @@ header{
 
 #logout_button{
     width: 200px;
-    height: 150px;
+    height: 100%;
     background-color: #00000000;
     font-size: 40px;
     font-family: 'Nanum-Gothic', sans-serif;
     border: 0;
     padding: 0;
     cursor: pointer;
+}
+
+#logout_button_p{
+    margin: 0;
 }
 
 #name{
@@ -121,10 +134,12 @@ nav{
 }
 
 .member_link{
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 300px;
     height: 50px;
     margin :0;
-    text-align: center;
     font-size: 40px;
     font-family: 'Nanum-Gothic', sans-serif;
     cursor: pointer;
@@ -140,8 +155,8 @@ nav{
 }
 
 #nav_member_menu_button{
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     background-color: #00000000;
     border: 0;
     cursor: pointer;
@@ -159,20 +174,23 @@ nav{
 /* 일정 추가란 */
 
 section{
-    width: 1920px;
+    width: 100%;
     height: 150px;
-    margin-bottom: 100px;
-    display: none;
+    margin-bottom: 50px;
 }
 
 #new_schedule_input_form{
-    height: 150px;
+    height: 100%;
     border: 1px solid black;
     margin: 0;
 }
 
+#input_datetime_space{
+    display: flex;
+}
+
 #input_datetime_and_add_button_space{
-    width: 1920px;
+    width: 100%;
     height: 100px;
     display: flex;
     align-items: center;
@@ -206,7 +224,7 @@ section{
 }
 
 #input_content{
-    width: 1920px;
+    width: 100%;
     height: 50px;
     font-size: 30px;
     font-family: 'Nanum-Gothic', sans-serif;
@@ -220,12 +238,14 @@ section{
 }
 
 .schedule_form{
-    width: 1920px;
+    width: 100%;
     height: fit-content;
     margin-bottom:0;
 }
 
 .schedule_day{
+    display: flex;
+    align-items: center;
     width: 100px;
     height: 50px;
     font-size: 30px;
@@ -235,7 +255,7 @@ section{
 }
 
 .schedule_content_text{
-    width: 1920px;
+    width: 100%;
     height: 50px;
     font-size: 30px;
     font-family: 'Nanum-Gothic', sans-serif;
@@ -243,7 +263,7 @@ section{
 }
 
 .schedule_time{
-    width: 718px;
+    width: 50%;
     height: 48px;
     font-size: 30px;
     font-family: 'Nanum-Gothic', sans-serif;
@@ -261,7 +281,6 @@ section{
 
 .schedule_time_and_buttons{
     display: flex;
-    height: 50px;
 }
 
 .modify_schedule_button, .delete_schedule_button{
@@ -285,4 +304,152 @@ section{
     border : 1px solid black;
     display: none;
     cursor: pointer;
+}
+
+@media screen and (max-width: 1000px){
+
+    header{
+        min-width: 360px;
+        height: 40px;
+        justify-content: space-between;
+    }
+
+    #member_menu_space{
+        width: 11.11%;
+    }
+
+    #menu_img{
+        width: 20px;
+        height: 20px;
+    }
+
+    #name{
+        width: 60px;
+        height: 100%;
+        font-size : 15px;
+    }
+
+    #year, #month{
+        width: 50px;
+        height: 40px;
+        font-size : 20px;
+    }
+
+    #year_space, #month_space{
+        width: 100px;
+        height: 100%;
+    }
+
+    .date_button_img{
+        width: 19px;
+        height: 23px;
+    }
+
+    #logout_space{
+        flex-grow: 0;
+    }
+
+    #logout_button{
+        width: 60px;
+        font-size: 15px;
+    }
+
+    /* nav */
+    .member_link{
+        width: 100px;
+        height: 40px;
+        font-size: 20px;
+        margin-bottom: 0;
+    }
+
+    #nav_member_menu_space{
+        width: 40px;
+        height: 40px;
+    }
+
+    #nav_member_list{
+        width: 100px;
+    }
+
+    #nav_background{
+        left: 100;
+    }
+    
+    /* 일정 추가란 */
+    section{
+        height: 100px;
+        margin-bottom : 30px;
+    }
+
+    #new_schedule_input_form{
+        min-width: 360px;
+    }
+
+    #input_datetime_and_add_button_space{
+        width: 100%;
+        height: 50px;
+        flex-grow: 0;
+    }
+
+    #input_date, #input_time{
+        width: 50%;
+        height: 50px;
+        font-size: 15px;
+    }
+
+    #input_datetime_space{
+        flex-grow: 1;
+    }
+
+    #input_add_button_space{
+        height: 100%;
+        flex-grow: 0;
+    }
+
+    #add_button{
+        width: 60px;
+        height: 50px;
+        font-size: 12px;
+    }
+
+    #input_content_space{
+        min-width: 360px;
+    }
+
+    #input_content{
+        font-size: 15px;
+    }
+
+    /* 일정 목록 */
+    .schedule{
+        min-width: 360px;
+        margin-bottom: 30px;
+    }
+
+    .schedule_day{
+        width: 60px;
+        height: 30px;
+        font-size: 15px;
+    }
+
+    .schedule_content_text{
+        height: 30px;
+        font-size: 15px;
+    }
+
+    .schedule_time{
+        height: 28px;
+        font-size: 15px;
+    }
+
+    .modify_date_input, .modify_time_input{
+        width: 90px;
+        height: 30px;
+    }
+
+    .modify_schedule_button, .delete_schedule_button, .confirm_modify_button, .modify_cancel_button{
+        height: 30px;
+        width: 60px;
+        font-size: 12px;
+    }
 }

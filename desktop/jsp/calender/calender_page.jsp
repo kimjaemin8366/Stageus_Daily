@@ -17,12 +17,15 @@
     }
 
     String user_id = (String) request.getParameter("user_id");
+    // 본인 게시판 여부 확인
+    Boolean if_owner = user_id.equals(logged_id);   
         
     // 타인 일정 페이지 접속 권한
 
-    if(!user_id.equals(logged_id) && logged_position.equals("사원") ){
+    if(!if_owner && logged_position.equals("사원") ){
         response.sendRedirect("./no_auth_alert_page.jsp");
     }
+
     
     Class.forName("com.mysql.jdbc.Driver");
     Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/calender","Stageus","8366");
@@ -86,6 +89,9 @@
 
 %>
 <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width", initial-scale=1>
     <link rel="stylesheet" type="text/css" href="../../css/font/font.css">
     <link rel="stylesheet" type="text/css" href="../../css/calender/calender_page.css">
     <title>일정</title>
@@ -94,7 +100,7 @@
     <header>
         <div id="member_menu_space">
             <button id="member_menu_button" type="button" onclick="open_menu()">
-                <img src="../../../source/member_menu.png">
+                <img src="../../../source/member_menu.png" id="menu_img">
             </button>
         </div>
         <p id="name"></p>
@@ -126,7 +132,7 @@
         <div id="nav_member_list">
             <div id="nav_member_menu_space">
                 <button id="nav_member_menu_button" type="button" onclick="close_menu()">
-                    <img src="../../../source/member_menu.png">
+                    <img src="../../../source/member_menu.png" id="menu_img">
                 </button>
             </div>
             <!-- <p id="이름" onclick="location.href=''">
@@ -249,7 +255,9 @@
 
             //회원 메뉴 보여주기 여부
             if(logged_position=="부장" || logged_position =="관리자"){
-                document.getElementById("member_menu_button").style.visibility = "visible";
+                document.getElementById("member_menu_space").style.display= "flex";
+            }else{
+                document.getElementById("member_menu_space").style.display= "none";
             }
 
             show_schedule_list(user_data, schedule_data);
@@ -301,9 +309,8 @@
                     new_day_div.appendChild(new_day_p);
                     last_written_day = day;
 
-                    now_screen_year, now_screen_month, new_day_div
                     new_form.append( make_content_div(idx, schedule_data[idx*4], schedule_data[idx*4+1], schedule_data[idx*4+2], now_time), make_bottom_div(idx, schedule_time, datetime[0],datetime[1]));
-                    new_schedule_div.append(now_screen_year, now_screen_month, new_day_div, new_form)
+                    new_schedule_div.append(new_day_div, new_form)
                     list.appendChild(new_schedule_div);
                 }  // 새 일자
                 else{
@@ -421,55 +428,59 @@
             new_time_p.className= "schedule_time";
             new_time_p.innerHTML = schedule_time;
 
-            // 수정 input form
-            var new_modify_date_input = document.createElement("input");
-            new_modify_date_input.className="modify_date_input";
-            new_modify_date_input.type = "date";
-            new_modify_date_input.name = "modified_schedule_date";
-            var new_modify_time_input = document.createElement("input");
-            new_modify_time_input.className="modify_time_input";
-            new_modify_time_input.type = "time";
-            new_modify_time_input.name = "modified_schedule_time";
+            if(<%=if_owner%>){
 
-            // 수정 전 날짜와 시간
-            var date_before_modified = document.createElement("input");
-            date_before_modified.className="before_modified_date";
-            date_before_modified.type = "hidden";
-            date_before_modified.value = date;
-            var time_before_modified = document.createElement("input");
-            time_before_modified.className="before_modified_time";
-            time_before_modified.type = "hidden";
-            time_before_modified.value = time;
+                // 수정 input form
+                var new_modify_date_input = document.createElement("input");
+                new_modify_date_input.className="modify_date_input";
+                new_modify_date_input.type = "date";
+                new_modify_date_input.name = "modified_schedule_date";
+                var new_modify_time_input = document.createElement("input");
+                new_modify_time_input.className="modify_time_input";
+                new_modify_time_input.type = "time";
+                new_modify_time_input.name = "modified_schedule_time";
 
+                // 수정 전 날짜와 시간
+                var date_before_modified = document.createElement("input");
+                date_before_modified.className="before_modified_date";
+                date_before_modified.type = "hidden";
+                date_before_modified.value = date;
+                var time_before_modified = document.createElement("input");
+                time_before_modified.className="before_modified_time";
+                time_before_modified.type = "hidden";
+                time_before_modified.value = time;
 
-            // 수정, 삭제 관련 버튼
-            var modify_button = document.createElement("input");
-            modify_button.className="modify_schedule_button";
-            modify_button.id = "modify_ready_button";
-            modify_button.type = "button";
-            modify_button.value = "일정 수정";
-            modify_button.addEventListener("click", function(){
-                modify_ready_event(idx);
-            })
+                // 수정, 삭제 관련 버튼
+                var modify_button = document.createElement("input");
+                modify_button.className="modify_schedule_button";
+                modify_button.id = "modify_ready_button";
+                modify_button.type = "button";
+                modify_button.value = "일정 수정";
+                modify_button.addEventListener("click", function(){
+                    modify_ready_event(idx);
+                })
 
-            var delete_button = document.createElement("input");
-            delete_button.className="delete_schedule_button";
-            delete_button.type = "submit";
-            delete_button.value = "일정 삭제";
+                var delete_button = document.createElement("input");
+                delete_button.className="delete_schedule_button";
+                delete_button.type = "submit";
+                delete_button.value = "일정 삭제";
 
-            var modify_done_button = document.createElement("input");
-            modify_done_button.className="confirm_modify_button";
-            modify_done_button.type = "submit";
-            modify_done_button.value = "수정 확인";
-            var modify_cancel_button = document.createElement("input");
-            modify_cancel_button.className="modify_cancel_button";
-            modify_cancel_button.type = "button";
-            modify_cancel_button.value = "수정 취소";
-            modify_cancel_button.addEventListener("click", function(){
-                modify_cancel_event(idx, date + " " + time);
-            })
-            
-            new_bottom_div.append(new_time_p, new_modify_date_input, new_modify_time_input, date_before_modified, time_before_modified, modify_button, delete_button, modify_done_button, modify_cancel_button);
+                var modify_done_button = document.createElement("input");
+                modify_done_button.className="confirm_modify_button";
+                modify_done_button.type = "submit";
+                modify_done_button.value = "수정 확인";
+                var modify_cancel_button = document.createElement("input");
+                modify_cancel_button.className="modify_cancel_button";
+                modify_cancel_button.type = "button";
+                modify_cancel_button.value = "수정 취소";
+                modify_cancel_button.addEventListener("click", function(){
+                    modify_cancel_event(idx, date + " " + time);
+                })
+                new_bottom_div.append(new_time_p, new_modify_date_input, new_modify_time_input, date_before_modified, time_before_modified, modify_button, delete_button, modify_done_button, modify_cancel_button);
+            }
+            else{
+                new_bottom_div.append(new_time_p);
+            }
             return new_bottom_div;
         }
 
@@ -477,12 +488,12 @@
             var date = document.getElementsByClassName("before_modified_date")[idx].value;
             var time = document.getElementsByClassName("before_modified_time")[idx].value;
 
-            // 버튼 사라지기 처리
+            // 수정 버튼,삭제 버튼 사라지기 처리
             document.getElementsByClassName("modify_schedule_button")[idx].style.display = "none";
             document.getElementsByClassName("delete_schedule_button")[idx].style.display = "none";
             document.getElementsByClassName("schedule_time")[idx].style.display = "none";
 
-            // 버튼 등장 처리
+            // 수정 확인, 수정 취소 버튼 등장 처리
             document.getElementsByClassName("confirm_modify_button")[idx].style.display = "inline";
             document.getElementsByClassName("modify_cancel_button")[idx].style.display = "inline";
 
@@ -506,7 +517,7 @@
             var hour = time[0]
             var minute = time[1];
 
-            // 버튼 등장 처리
+            // 수정 버튼 등장 처리
 
             document.getElementsByClassName("modify_schedule_button")[idx].style.display = "inline";
             document.getElementsByClassName("delete_schedule_button")[idx].style.display = "inline";
@@ -540,26 +551,16 @@
         //일정 추가
 
         function if_another_user_schedule(){
-            if("<%=logged_id%>"=="<%=user_id%>"){
-                document.getElementsByTagName("section")[0].style.display = "block";
+            if(!(<%=if_owner%>)){
+                document.getElementsByTagName("section")[0].style.display = "none";
+                document.getElementsByTagName("header")[0].style.marginBottom = "50px";
             }
         }
 
-        // 권한이 없는 사람이 다른 사람의 일정 페이지를 갈 경우
-        // function can_enter_schedule(){
-        //     if(("<%=logged_id%>"!="<%=user_id%>") && ("<%=logged_position%>"=="사원")){
-        //         location.href="./no_auth_alert_page.jsp";
-        //     }
-        // }
-
         window.onload=function(){
-            // can_enter_schedule();
             make_screen();
             make_members_menu();
             if_another_user_schedule();
-        
-            console.log("<%=user_id%>");
-        
         }
     </script>
 </body>

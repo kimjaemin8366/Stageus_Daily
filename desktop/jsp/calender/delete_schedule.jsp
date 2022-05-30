@@ -27,18 +27,19 @@
 
     ResultSet result = user_query.executeQuery();
     if(result.next()){
-        if(logged_id.equals(result.getString(1))){
-            response.SendRedirect("./no_auth_alert_page.jsp");
+        if(!(logged_id.equals(result.getString(1)))){ 
+            response.sendRedirect("./no_auth_alert_page.jsp");
+        }else{
+
+            // 삭제 진행
+            String sql = "DELETE FROM schedule WHERE schedule_id = ?";
+            PreparedStatement query = connect.prepareStatement(sql);
+            query.setString(1, schedule_id);
+        
+            query.executeUpdate();
         }
     }
 
-    // 삭제 과정
-    
-    String sql = "DELETE FROM schedule WHERE schedule_id = ?";
-    PreparedStatement query = connect.prepareStatement(sql);
-    query.setString(1, schedule_id);
-
-    query.executeUpdate();
 
 %>
 

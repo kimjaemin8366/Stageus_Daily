@@ -8,16 +8,16 @@
 <%
     String logged_id = (String) session.getAttribute("logged_id");
 
-    if(logged_id=="" || logged_id=null){
+    if(logged_id=="" || logged_id==null){
         response.sendRedirect("../login/login_page.jsp");
     }
     
-    String screen_year = request.getParameter("now_screen_year");
-    String screen_month = request.getParameter("now_screen_month");
+    String screen_year = (String) request.getParameter("now_screen_year");
+    String screen_month = (String) request.getParameter("now_screen_month");
 
-    String date = request.getParameter("new_schedule_date");
-    String time = request.getParameter("new_schedule_time");
-    String content = request.getParameter("new_schedule_content");
+    String date = (String) request.getParameter("new_schedule_date");
+    String time = (String) request.getParameter("new_schedule_time");
+    String content = (String) request.getParameter("new_schedule_content");
     String datetime = date + " " + time+ ":00";
 
     Class.forName("com.mysql.jdbc.Driver");
@@ -37,7 +37,7 @@
 
     <script>
         window.onload=function(){
-            location.href="./calender_page.jsp?user_id=<%=id%>&year=<%=screen_year%>&month=<%=screen_month%>";
+            location.href="./calender_page.jsp?user_id=<%=logged_id%>&year=<%=screen_year%>&month=<%=screen_month%>";
         }
     </script>
 </body>

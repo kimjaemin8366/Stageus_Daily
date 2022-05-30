@@ -32,21 +32,20 @@
 
     ResultSet result = user_query.executeQuery();
     if(result.next()){
-        if(logged_id.equals(result.getString(1))){
-            response.SendRedirect("./no_auth_alert_page.jsp");
+        if(!(logged_id.equals(result.getString(1)))){
+            response.sendRedirect("./no_auth_alert_page.jsp");
+        }
+        else{
+            // 수정 진행
+            String sql = "UPDATE schedule SET schedule_content=?, schedule_datetime=? WHERE schedule_id=?";
+            PreparedStatement query = connect.prepareStatement(sql);
+            query.setString(1, content);
+            query.setString(2, datetime);
+            query.setString(3, schedule_id);
+        
+            query.executeUpdate();
         }
     }
-
-    // 수정 진행
-    
-    String sql = "UPDATE schedule SET schedule_content=?, schedule_datetime=? WHERE schedule_id=?";
-    PreparedStatement query = connect.prepareStatement(sql);
-    query.setString(1, content);
-    query.setString(2, datetime);
-    query.setString(3, schedule_id);
-
-    query.executeUpdate();
-
 %>
 
 <body>
