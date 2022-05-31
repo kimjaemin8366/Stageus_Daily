@@ -90,6 +90,8 @@
                 event.preventDefault();
                 return;
             }
+
+            document.getElementById("join_input_id").removeAttribute("disabled");
         }
 
         function id_duplicate_check(){

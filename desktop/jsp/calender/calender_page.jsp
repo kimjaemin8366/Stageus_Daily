@@ -145,7 +145,7 @@
             <div id="input_datetime_and_add_button_space">
                 <div id="input_datetime_space">
                     <input id="input_date" type="date" name="new_schedule_date">
-                    <input id="input_time" type="time" name="new_schedule_time">
+                    <input id="input_time" type="time" name="new_schedule_time" value="00:00">
                 </div>
                 <div id="input_add_button_space">
                     <input id="add_button" type="submit" value="일정 추가">
@@ -233,6 +233,7 @@
         // 전체 화면 틀
 
         function make_screen(){
+            document.getElementById("input_date").value= get_now_time().split(" ")[0];
             var user_string = "<%=user_data%>";
             var schedule_string = "<%=schedule_data%>";
             var user_data = user_string.substring(1, user_string.length-1).split(", ");

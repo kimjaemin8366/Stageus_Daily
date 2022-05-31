@@ -263,7 +263,7 @@ section{
 }
 
 .schedule_time{
-    width: 50%;
+    width: 37.5%;
     height: 48px;
     font-size: 30px;
     font-family: 'Nanum-Gothic', sans-serif;
@@ -445,6 +445,7 @@ section{
     .modify_date_input, .modify_time_input{
         width: 90px;
         height: 30px;
+        font-size: 10px;
     }
 
     .modify_schedule_button, .delete_schedule_button, .confirm_modify_button, .modify_cancel_button{
