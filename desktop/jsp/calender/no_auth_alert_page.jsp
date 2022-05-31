@@ -10,7 +10,6 @@
 <%
     String logged_id = (String) session.getAttribute("logged_id");
     String logged_position = (String) session.getAttribute("position");
-    Boolean logged = false;
 
     if(logged_id=="" || logged_id==null){
         response.sendRedirect("../login/login_page.jsp");

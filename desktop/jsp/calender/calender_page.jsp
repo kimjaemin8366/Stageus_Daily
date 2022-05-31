@@ -10,22 +10,17 @@
 <%
     String logged_id = (String) session.getAttribute("logged_id");
     String logged_position = (String) session.getAttribute("position");
-    Boolean logged = false;
+    String user_id = (String) request.getParameter("user_id");
+    
+    Boolean if_owner = user_id.equals(logged_id);       
 
     if(logged_id=="" || logged_id==null){
         response.sendRedirect("../login/login_page.jsp");
-    }
-
-    String user_id = (String) request.getParameter("user_id");
-    // 본인 게시판 여부 확인
-    Boolean if_owner = user_id.equals(logged_id);   
-        
-    // 타인 일정 페이지 접속 권한
-
-    if(!if_owner && logged_position.equals("사원") ){
+    }else if(!if_owner && logged_position.equals("사원") ){
         response.sendRedirect("./no_auth_alert_page.jsp");
     }
-
+        
+    // 타인 일정 페이지 접속 권한
     
     Class.forName("com.mysql.jdbc.Driver");
     Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/calender","Stageus","8366");

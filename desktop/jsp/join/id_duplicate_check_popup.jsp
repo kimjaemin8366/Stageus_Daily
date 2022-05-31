@@ -6,20 +6,27 @@
 <%@ page import="java.sql.ResultSet" %> 
 
 <%
-    String id = (String) request.getParameter("user_id");
-
-    Class.forName("com.mysql.jdbc.Driver");
-    Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/calender","Stageus","8366");
-    
-    String sql = "SELECT user_id FROM users WHERE user_id=?";
-    PreparedStatement query = connect.prepareStatement(sql);
-    query.setString(1, id);
-
-    ResultSet result = query.executeQuery();
+    String input_id = (String) request.getParameter("user_id");
     Boolean duplicated = false;
 
-    if(result.next()){
-        duplicated= true;
+    if(input_id=="" || input_id==null){
+        response.sendRedirect("./join_page.jsp");
+    }
+    else{
+
+        Class.forName("com.mysql.jdbc.Driver");
+        Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/calender","Stageus","8366");
+        
+        String sql = "SELECT user_id FROM users WHERE user_id=?";
+        PreparedStatement query = connect.prepareStatement(sql);
+        query.setString(1, input_id);
+    
+        ResultSet result = query.executeQuery();
+        Boolean duplicated = false;
+    
+        if(result.next()){
+            duplicated= true;
+        }
     }
 
 %>
@@ -49,6 +56,8 @@
 
     <script>
 
+        
+        // 사용하기 버튼 출력 여부
         function can_use_this_id(){
             var duplicated = <%=duplicated%>;
             if(duplicated==true){
@@ -61,6 +70,7 @@
             console.log(<%=duplicated%>)
         }
 
+        // 사용하기 버튼 클릭 이벤트
         function use_this_id(){
             opener.document.join_form.check_duplication.value= "Check";
             opener.document.join_form.input_id.value= "<%=id%>";
@@ -69,11 +79,9 @@
         }
 
         window.onload = function(){
-            var input_id = "<%=id%>";
-            console.log(input_id);
+            var input_id = "<%=input_id%>";
             document.getElementById("input_id_space").value = input_id;
-
-            can_use_this_id ();
+            can_use_this_id();
         }
     </script>
 </body>

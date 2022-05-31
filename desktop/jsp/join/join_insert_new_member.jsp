@@ -7,24 +7,46 @@
 
 <%
 
+    Boolean join_success = true;
+
     String id = (String) request.getParameter("input_id");
+    if(id=="" || id==null || id.length()>21){
+        join_success = false;
+    }
+
     String pw = (String) request.getParameter("input_pw");
+    if(pw=="" || pw==null || pw.length()>21){
+        join_success = false;
+    }
+
     String name= (String) request.getParameter("input_name");
+    if(name=="" || name==null || name.length()>21){
+        join_success = false;
+    }
+
     String department = (String) request.getParameter("input_department");
+    if(department=="" || department==null || department.length()>3){
+        join_success= false;
+    }
     String position = (String) request.getParameter("input_position");
+    if(position=="" || position==null || position.length()>3){
+        join_success = false;
+    }
 
-    Class.forName("com.mysql.jdbc.Driver");
-    Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/calender","Stageus","8366");
+    if(join_success){
+        Class.forName("com.mysql.jdbc.Driver");
+        Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/calender","Stageus","8366");
+        
+        String sql = "INSERT INTO users(user_id, password, name, department,position) VALUES (?,?,?,?,?)";
+        PreparedStatement query = connect.prepareStatement(sql);
+        query.setString(1, id);
+        query.setString(2, pw);
+        query.setString(3, name);
+        query.setString(4, department);
+        query.setString(5, position);
     
-    String sql = "INSERT INTO users(user_id, password, name, department,position) VALUES (?,?,?,?,?)";
-    PreparedStatement query = connect.prepareStatement(sql);
-    query.setString(1, id);
-    query.setString(2, pw);
-    query.setString(3, name);
-    query.setString(4, department);
-    query.setString(5, position);
-
-    query.executeUpdate();
+        query.executeUpdate();
+    }
 
 %>
 
@@ -32,8 +54,14 @@
 <body>
     <script>
         window.onload = function(){
-            alert("환영합니다.");
-            location.href="../login/login_page.jsp";
+
+            if(<%=join_success%>){
+                alert("환영합니다.");
+                location.href="../login/login_page.jsp";
+            }else{
+                alert("가입 내용 오류");
+                location.href="./join_page.jsp";
+            }
         }
     </script>
 </body>
