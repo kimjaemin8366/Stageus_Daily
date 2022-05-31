@@ -4,10 +4,11 @@
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.sql.PreparedStatement" %> 
 <%@ page import="java.sql.ResultSet" %> 
-<%@ page import="java.util.Date"%>
+<%@ page import="java.time.LocalDate"%>
 
 <%
     Boolean modify_success = true;
+    LocalDate now = LocalDate.now();
     String logged_id = (String) session.getAttribute("logged_id");
 
     if(logged_id=="" || logged_id==null){

@@ -4,16 +4,27 @@
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.sql.PreparedStatement" %> 
 <%@ page import="java.sql.ResultSet" %> 
+<%@ page import="java.time.LocalDate"%>
 
 <%
     String logged_id = (String) session.getAttribute("logged_id");
+    LocalDate now = LocalDate.now();
 
     if(logged_id=="" || logged_id==null){
         response.sendRedirect("../login/login_page.jsp");
     }
     
-    String screen_year = request.getParameter("now_screen_year");
-    String screen_month = request.getParameter("now_screen_month");
+    // 삭제 당시 화면에 연도, 월의 값을 서버로 입력받지 못할 경우 직접 추가해줌.
+    String screen_year = (String) request.getParameter("now_screen_year");
+    if(screen_year=="" || screen_year==null){
+        screen_year = String.valueOf(now.getYear());
+    }
+    
+    String screen_month = (String) request.getParameter("now_screen_month");
+    if(screen_month=="" || screen_month == null){
+        screen_month = String.valueOf(now.getMonth());
+    }
+
 
     String schedule_id = request.getParameter("schedule_id");
 
