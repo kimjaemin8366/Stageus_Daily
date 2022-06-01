@@ -66,7 +66,6 @@
                 document.getElementById("duplicate_check_result").innerHTML = "사용 가능한 아이디입니다.";
                 document.getElementById("use_this_id_button").style.visibility = "visible";
             }
-            console.log(<%=duplicated%>)
         }
 
         // 사용하기 버튼 클릭 이벤트

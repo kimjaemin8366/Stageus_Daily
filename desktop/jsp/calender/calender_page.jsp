@@ -61,8 +61,8 @@
 
     String year = request.getParameter("year");
     String month = request.getParameter("month");
-    String compare_start_date = year + "-" + month + "-01";
-    String compare_last_date = year + "-" + month + "-31"; 
+    String compare_start_date = year + "-" + month + "-01 00:00:00";
+    String compare_last_date = year + "-" + month + "-31 23:59:59"; 
 
     String schedule_sql = "SELECT * FROM schedule WHERE schedule_datetime >= ? AND schedule_datetime <= ? AND user_id=? ORDER BY schedule_datetime";
     PreparedStatement schedule_query = connect.prepareStatement(schedule_sql);
@@ -130,9 +130,6 @@
                     <img src="../../../source/member_menu.png" id="menu_img">
                 </button>
             </div>
-            <!-- <p id="이름" onclick="location.href=''">
-                
-            </p> -->
         </div>
         <div id="nav_background" onclick="close_menu()">
 
@@ -145,7 +142,7 @@
             <div id="input_datetime_and_add_button_space">
                 <div id="input_datetime_space">
                     <input id="input_date" type="date" name="new_schedule_date">
-                    <input id="input_time" type="time" name="new_schedule_time" value="00:00">
+                    <input id="input_time" type="time" name="new_schedule_time">
                 </div>
                 <div id="input_add_button_space">
                     <input id="add_button" type="submit" value="일정 추가">
@@ -158,56 +155,41 @@
     </section>
 
     <article>
-        <!-- <form id="8" class="schedule_form" action="modify_schedule.jsp" onsubmit="before_modify_schedule_input()">
-            <div>
-                <p class="schedule_day">8일</p>
-            </div>
-            <div>
-                <input class="schedule_content_text" type="text" value="놀기" disabled>
-                <input class="schedule_content_id" type="hidden" name="content_id">
-                <input class="before_modified_content" type="hidden">
-            </div>
-            <div class="schedule_time_and_buttons">
-                <p class="schedule_time">오후 1:30</p>
-                <input class="modify_date_input" type="date" name="modified_schedule_date"> 
-                <input class="modify_time_input" type="time" name="modified_schedule_time">
-                <input class="before_modified_date" type="hidden">
-                <input class="before_modified_time" type="hidden">
-                <input class="schedule_button" type="button" value="일정 수정" onclick="modify_ready()">
-                <input class="schedule_button" type="submit" value="일정 삭제">
-                <input class="schedule_button_hidden" type="submit" value="수정 확인">
-                <input class="schedule_button_hidden" type="button" value="수정 취소">
-            </div>
 
-        </form> -->
     </article>
+
     <script>
 
-        // 연도, 월 이동
+        // 연도, 월 이동 버튼 클릭
         function move_date(id){
+            var year = parseInt("<%=year%>");
+            var month = parseInt("<%=month%>");
+
             if(id=="year_back"){
-                location.href="./calender_page.jsp?user_id=<%=user_id%>&year=" + (parseInt("<%=year%>")-1) + "&month=<%=month%>";
+                year -= 1;
             }
             else if(id=="year_forward"){
-                location.href="./calender_page.jsp?user_id=<%=user_id%>&year=" + (parseInt("<%=year%>")+1) + "&month=<%=month%>";
+                year += 1;
             }
             else if(id=="month_back"){
-                if("<%=month%>" != "1"){
-                    location.href="./calender_page.jsp?user_id=<%=user_id%>&year=<%=year%>&month=" + (parseInt("<%=month%>")-1); 
+                if(month!=1){
+                    month -= 1;
                 }else{
-                    location.href="./calender_page.jsp?user_id=<%=user_id%>&year=<%=year%>&month=12";
+                    month = 12;
                 }
             }
             else{
-                if("<%=month%>" != "12"){
-                    location.href="./calender_page.jsp?user_id=<%=user_id%>&year=<%=year%>&month=" + (parseInt("<%=month%>")+1); 
+                if(month!=12){
+                    month += 1;
                 }else{
-                    location.href="./calender_page.jsp?user_id=<%=user_id%>&year=<%=year%>&month=1";
+                    month = 1;
                 }
             }
+
+            location.href="./calender_page.jsp?user_id=<%=user_id%>&year="+ year + "&month="+ month;
         }
 
-        // 일정 추가 검사
+        // 일정 추가 조건 검사
         function before_new_schedule_input(){
             var date = document.getElementById("input_date").value;
             var time = document.getElementById("input_time").value;
@@ -233,12 +215,12 @@
         // 전체 화면 틀
 
         function make_screen(){
-            document.getElementById("input_date").value= get_now_time().split(" ")[0];
             var user_string = "<%=user_data%>";
             var schedule_string = "<%=schedule_data%>";
             var user_data = user_string.substring(1, user_string.length-1).split(", ");
             var schedule_data = schedule_string.substring(1, schedule_string.length-1).split(", ");
             var logged_position = "<%=logged_position%>";
+            var now = get_now_datetime();
 
             // 헤더 내용
             document.getElementById("now_screen_year").value = "<%=year%>";   
@@ -247,7 +229,12 @@
             document.getElementById("month").innerHTML = "<%=month%>"+"월";
             document.getElementById("name").innerHTML = user_data[1];
 
-            console.log(logged_position);
+            // 일정 추가란 초기값 부여
+            var datetime = now.split(" ");
+            var hour = datetime[1].split(":")[0];
+            var minute = datetime[1].split(":")[1];
+            document.getElementById("input_date").value= datetime[0];
+            document.getElementById("input_time").value= hour + ":" + minute;
 
             //회원 메뉴 보여주기 여부
             if(logged_position=="부장" || logged_position =="관리자"){
@@ -256,15 +243,58 @@
                 document.getElementById("member_menu_space").style.display= "none";
             }
 
-            show_schedule_list(user_data, schedule_data);
+            show_schedule_list(user_data, schedule_data, now);
+            if_another_user_schedule(); 
         }
 
+        //---------------------------------------------------------------------------------------------------------          
+        // 회원 메뉴 목록 
+        function make_members_menu(){
+            var members_string = "<%=user_list_data%>";
+            var members_list = members_string.substring(1, members_string.length-1).split(", ");
+            var member_count = <%=user_count%>;
+            var list_div = document.getElementById("nav_member_list");
+
+            for(var idx=0; idx<member_count; idx++){
+                var new_member_link = document.createElement("p");
+                member_name = members_list[idx*2+1];
+                member_id = members_list[idx*2];
+                new_member_link.innerHTML = member_name;
+                new_member_link.className = "member_link";
+                list_div.appendChild(new_member_link);
+
+                move_to_member_schedule(member_id, idx);
+            }
+        }
+
+        // 회원 메뉴로 이동 함수
+        function move_to_member_schedule(member_id, idx){
+            var member_link = document.getElementsByClassName("member_link")[idx];
+            member_link.addEventListener("click", function(){
+                location.href="./calender_page.jsp?user_id="+ member_id + "&year=<%=year%>&month=<%=month%>";       
+            })
+        }
+        
+        // 회원 메뉴 열기
+        function open_menu(){
+            document.getElementsByTagName("nav")[0].style.visibility = "visible";
+            document.getElementsByTagName("nav")[0].style.left = "0px";
+        }
+
+        // 회원 메뉴 닫기
+        function close_menu(){
+            document.getElementsByTagName("nav")[0].style.visibility = "hidden";
+            document.getElementsByTagName("nav")[0].style.left = "-300px";
+        }
+
+
+
+        //---------------------------------------------------------------------------------------------------------
         // 일자별 설계
 
-        function show_schedule_list(user_data, schedule_data){
+        function show_schedule_list(user_data, schedule_data, now){
             var schedule_count = <%=schedule_count%>;
             var list = document.getElementsByTagName("article")[0];
-            var now_time = get_now_time();
             var last_written_day = "";
 
             for(var idx=0; idx<schedule_count; idx++){
@@ -282,6 +312,8 @@
                 var schedule_time = "";
                 if(hour>12){
                     schedule_time = "오후 "+(hour-12)+":"+minute;
+                }else if(hour==12){
+                    schedule_time = "오후 "+12+":"+minute;
                 }else if(hour>0){
                     schedule_time = "오전 "+hour+":"+minute;
                 }else{
@@ -305,7 +337,7 @@
                     new_day_div.appendChild(new_day_p);
                     last_written_day = day;
 
-                    new_form.append( make_content_div(idx, schedule_data[idx*4], schedule_data[idx*4+1], schedule_data[idx*4+2], now_time), make_bottom_div(idx, schedule_time, datetime[0],datetime[1]));
+                    new_form.append( make_content_div(idx, schedule_data[idx*4], schedule_data[idx*4+1], schedule_data[idx*4+2], now), make_bottom_div(idx, schedule_time, datetime[0],datetime[1]));
                     new_schedule_div.append(new_day_div, new_form)
                     list.appendChild(new_schedule_div);
                 }  // 새 일자
@@ -314,54 +346,14 @@
                     var new_form = document.createElement("form");
                     new_form.className="schedule_form";
                     new_form.setAttribute("action", "delete_schedule.jsp");
-                    new_form.append(make_content_div(idx, schedule_data[idx*4], schedule_data[idx*4+1], schedule_data[idx*4+2], now_time), make_bottom_div(idx, schedule_time, datetime[0],datetime[1]))
+                    new_form.append(make_content_div(idx, schedule_data[idx*4], schedule_data[idx*4+1], schedule_data[idx*4+2], now), make_bottom_div(idx, schedule_time, datetime[0],datetime[1]))
                     day_div.append(new_form);
-                } // 하나 일자 여러 일정
+                } // 하나 일자의 여러 일정
             }
         }
-
-        
-        // 메뉴 목록 
-        function make_members_menu(){
-            var members_string = "<%=user_list_data%>";
-            var members_list = members_string.substring(1, members_string.length-1).split(", ");
-            var member_count = <%=user_count%>;
-            var list_div = document.getElementById("nav_member_list");
-
-            for(var idx=0; idx<member_count; idx++){
-                var new_member_link = document.createElement("p");
-                member_name = members_list[idx*2+1];
-                member_id = members_list[idx*2];
-                new_member_link.innerHTML = member_name;
-                new_member_link.className = "member_link";
-                list_div.appendChild(new_member_link);
-
-                move_to_member_schedule(member_id, idx);
-            }
-        }
-
-        function move_to_member_schedule(member_id, idx){
-            var member_link = document.getElementsByClassName("member_link")[idx];
-            member_link.addEventListener("click", function(){
-                location.href="./calender_page.jsp?user_id="+ member_id + "&year=<%=year%>&month=<%=month%>";       
-            })
-        }
-        
-
-        function open_menu(){
-            document.getElementsByTagName("nav")[0].style.visibility = "visible";
-        }
-
-        function close_menu(){
-            document.getElementsByTagName("nav")[0].style.visibility = "hidden";
-        }
-
-
-        // 내용 div
-
 
         //현재 시간 가져오기
-        function get_now_time(){
+        function get_now_datetime(){
             var date = new Date();
             var year = date.getFullYear();
             var month = ('0'+(date.getMonth()+1)).slice(-2);
@@ -374,15 +366,16 @@
 
 
         //취소선 함수
-        function check_strikethrough(text_space, now_time, schedule_time){
-            if(now_time > schedule_time){
+        function check_strikethrough(text_space, now_datetime, schedule_datetime){
+            if(now_datetime > schedule_datetime){
                 text_space.style.textDecorationLine = "line-through";
             }
         }
 
         // 각 일자별 내용
-        function make_content_div(idx, content_id, content, schedule_time, now_time){
+        function make_content_div(idx, content_id, content, schedule_time, now_datetime){
 
+            // 일정 내용 처리
             var new_content_div = document.createElement("div");
             var new_content_input = document.createElement("input");
             new_content_input.type = "text";
@@ -390,8 +383,10 @@
             new_content_input.name = "schedule_content";
             new_content_input.setAttribute("disabled", true);
             new_content_input.value = content;
-            check_strikethrough(new_content_input, now_time, schedule_time);
-            
+            check_strikethrough(new_content_input, now_datetime, schedule_time);
+
+
+            // 일자별 원래 내용 따로 저장
             var new_content_before_modified = document.createElement("input");
             new_content_before_modified.type ="hidden";
             new_content_before_modified.className="before_modified_content";
@@ -401,6 +396,8 @@
             new_content_id.name = "schedule_id";
             new_content_id.value = content_id;
 
+
+            //일자별 원래 일정 따로 저장
             var now_screen_year = document.createElement("input");
             now_screen_year.type = "hidden";
             now_screen_year.name = "now_screen_year";
@@ -424,9 +421,10 @@
             new_time_p.className= "schedule_time";
             new_time_p.innerHTML = schedule_time;
 
+            // 로그인한 계정의 일정일 경우
             if(<%=if_owner%>){
 
-                // 수정 input form
+                // 수정날짜, 수정 시간 input form
                 var new_modify_date_input = document.createElement("input");
                 new_modify_date_input.className="modify_date_input";
                 new_modify_date_input.type = "date";
@@ -465,6 +463,7 @@
                 modify_done_button.className="confirm_modify_button";
                 modify_done_button.type = "submit";
                 modify_done_button.value = "수정 확인";
+
                 var modify_cancel_button = document.createElement("input");
                 modify_cancel_button.className="modify_cancel_button";
                 modify_cancel_button.type = "button";
@@ -480,11 +479,13 @@
             return new_bottom_div;
         }
 
+
+        // 일정 수정 버튼을 눌렀을 경우 이벤트
         function modify_ready_event(idx){
             var date = document.getElementsByClassName("before_modified_date")[idx].value;
             var time = document.getElementsByClassName("before_modified_time")[idx].value;
 
-            // 수정 버튼,삭제 버튼 사라지기 처리
+            // 일정 수정 버튼,일정 삭제 버튼 사라지기 처리
             document.getElementsByClassName("modify_schedule_button")[idx].style.display = "none";
             document.getElementsByClassName("delete_schedule_button")[idx].style.display = "none";
             document.getElementsByClassName("schedule_time")[idx].style.display = "none";
@@ -499,13 +500,14 @@
             document.getElementsByClassName("modify_time_input")[idx].style.display = "inline";
             document.getElementsByClassName("modify_time_input")[idx].value = time;
 
-            // 취소선 제거 처리, 수정칸 수정 가능하게
+            // 취소선 제거, 내용란에서 직접 수정 가능하게 처리.
             document.getElementsByClassName("schedule_content_text")[idx].style.textDecorationLine = "none";
             document.getElementsByClassName("schedule_content_text")[idx].removeAttribute("disabled");
 
             document.getElementsByClassName("schedule_form")[idx].setAttribute("action", "modify_schedule.jsp");
         }
 
+        // 수정 취소 버튼을 눌렀을 경우 이벤트
         function modify_cancel_event(idx, schedule_time){
             var content = document.getElementsByClassName("before_modified_content")[idx].value;
             var date = document.getElementsByClassName("before_modified_date")[idx].value;
@@ -513,39 +515,38 @@
             var hour = time[0]
             var minute = time[1];
 
-            // 수정 버튼 등장 처리
-
+            // 일정 수정, 일정 삭제 버튼 등장 처리
             document.getElementsByClassName("modify_schedule_button")[idx].style.display = "inline";
             document.getElementsByClassName("delete_schedule_button")[idx].style.display = "inline";
             document.getElementsByClassName("schedule_time")[idx].style.display = "block";
             
-            // 시간 원래 내용 출력
-            if(hour<=12){
+            // 원래의 일정 시간 출력
+            if(hour<12){
                 document.getElementsByClassName("schedule_time")[idx].innerHTML = "오전 " + hour + ":" + minute;
             }else{
-                document.getElementsByClassName("schedule_time")[idx].innerHTML = "오후 " + hour + ":" + minute;
+                document.getElementsByClassName("schedule_time")[idx].innerHTML = "오후 " + (hour-12) + ":" + minute;
             }
 
 
-            // 버튼 사라지기 처리
+            // 수정 확인, 수정 취소버튼 사라지기 처리
             document.getElementsByClassName("confirm_modify_button")[idx].style.display = "none";
             document.getElementsByClassName("modify_cancel_button")[idx].style.display = "none";
             document.getElementsByClassName("modify_date_input")[idx].style.display = "none";
             document.getElementsByClassName("modify_time_input")[idx].style.display = "none";
 
-            // 내용란 원 상태로 돌리기
+            // 원래의 일정 내용 출력, 수정 불가 처리
             text_space = document.getElementsByClassName("schedule_content_text")[idx];
             text_space.value = content;
             text_space.setAttribute("disabled", true);
 
             // 취소선 처리
-            check_strikethrough(text_space, get_now_time(), schedule_time);
+            check_strikethrough(text_space, get_now_datetime(), schedule_time);
 
             document.getElementsByClassName("schedule_form")[idx].setAttribute("action", "delete_schedule.jsp");
         }
 
-        //일정 추가
 
+        //본인 계정의 일정이 아닐 경우 일정 추가란 없애기
         function if_another_user_schedule(){
             if(!(<%=if_owner%>)){
                 document.getElementsByTagName("section")[0].style.display = "none";
@@ -554,9 +555,8 @@
         }
 
         window.onload=function(){
-            make_screen();
-            make_members_menu();
-            if_another_user_schedule();
+            make_screen(); // 화면 제작
+            make_members_menu(); // 회원 메뉴 제작
         }
     </script>
 </body>
