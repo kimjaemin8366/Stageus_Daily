@@ -26,7 +26,7 @@
                 <p id="password_same_check_p"></p>
             </div>
             <div>
-                <input id="name_input" class="join_input" type="text" name="input_name" placeholder="이름" maxlength="20">
+                <input id="name_input" class="join_input" type="text" name="input_name" placeholder="이름" maxlength="5">
             </div>
             <div>
                 <select class="join_input" name="input_department">

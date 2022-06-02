@@ -40,9 +40,10 @@
     if(content == "" || content == null){
         input_success = false;
     }
-    String datetime = date + " " + time+ ":00";
 
     if(input_success){
+        String datetime = date + " " + time+ ":00";
+        
         Class.forName("com.mysql.jdbc.Driver");
         Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/calender","Stageus","8366");
         
@@ -61,7 +62,6 @@
 
     <script>
         window.onload=function(){
-            alert("<%=time%>");
             if(!(<%=input_success%>)){
                 alert("일정 추가 실패");
             }

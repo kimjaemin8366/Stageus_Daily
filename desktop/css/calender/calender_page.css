@@ -25,11 +25,6 @@ header{
     width: 100px;
 }
 
-#menu_img{
-    width: 50px;
-    height: 50px;
-}
-
 #member_menu_button{
     width: fit-content;
     height: fit-content;
@@ -38,13 +33,10 @@ header{
     cursor: pointer;
 }
 
-#name_space{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 200px;
-    height: 100%;
-    flex-grow: 0;
+
+#menu_img{
+    width: 50px;
+    height: 50px;
 }
 
 #name{
@@ -54,6 +46,8 @@ header{
     width: 200px;
     height: 100%;
     margin: 0;
+    font-size: 40px;
+    font-family: 'Nanum-Gothic', sans-serif;
 }
 
 #year_space, #month_space{
@@ -111,11 +105,6 @@ header{
     margin: 0;
 }
 
-#name{
-    font-size: 40px;
-    font-family: 'Nanum-Gothic', sans-serif;
-}
-
 /* 회원 목록 메뉴란 */
 nav{
     position: fixed;
@@ -135,19 +124,6 @@ nav{
     flex-direction: column;
 }
 
-.member_link{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 300px;
-    height: 50px;
-    margin :0;
-    font-size: 40px;
-    font-family: 'Nanum-Gothic', sans-serif;
-    cursor: pointer;
-    margin-bottom: 20px;
-}
-
 #nav_member_menu_space{
     display: flex;
     justify-content: center;
@@ -162,6 +138,19 @@ nav{
     background-color: #00000000;
     border: 0;
     cursor: pointer;
+}
+
+.member_link{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 300px;
+    height: 50px;
+    margin :0;
+    font-size: 40px;
+    font-family: 'Nanum-Gothic', sans-serif;
+    cursor: pointer;
+    margin-bottom: 20px;
 }
 
 #nav_background{
@@ -187,16 +176,17 @@ section{
     margin: 0;
 }
 
-#input_datetime_space{
-    display: flex;
-}
-
 #input_datetime_and_add_button_space{
     width: 100%;
     height: 100px;
     display: flex;
     align-items: center;
 }
+
+#input_datetime_space{
+    display: flex;
+}
+
 
 #input_date, #input_time{
     width: 400px;
@@ -266,7 +256,7 @@ section{
 
 .schedule_time{
     width: calc(37.5% - 2px);
-    min-width: 400px;
+    min-width: 398px;
     height: 48px;
     font-size: 30px;
     font-family: 'Nanum-Gothic', sans-serif;

@@ -14,13 +14,13 @@
     
     Boolean if_owner = user_id.equals(logged_id);       
 
+            
+    // 타인 일정 페이지 접속 권한
     if(logged_id=="" || logged_id==null){
         response.sendRedirect("../login/login_page.jsp");
     }else if(!if_owner && logged_position.equals("사원") ){
         response.sendRedirect("./no_auth_alert_page.jsp");
     }
-        
-    // 타인 일정 페이지 접속 권한
     
     Class.forName("com.mysql.jdbc.Driver");
     Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/calender","Stageus","8366");
@@ -131,10 +131,9 @@
                 </button>
             </div>
         </div>
-        <div id="nav_background" onclick="close_menu()">
-
-        </div>
+        <div id="nav_background" onclick="close_menu()"></div>
     </nav>
+    
     <section>
         <form id="new_schedule_input_form" action="input_schedule.jsp" onsubmit="before_new_schedule_input()">
             <input type="hidden" id="now_screen_year" name="now_screen_year">
@@ -386,7 +385,7 @@
             check_strikethrough(new_content_input, now_datetime, schedule_time);
 
 
-            // 일자별 원래 내용 따로 저장
+            // 일자별 원래 내용 따로 저장(submit할 때 보냄)
             var new_content_before_modified = document.createElement("input");
             new_content_before_modified.type ="hidden";
             new_content_before_modified.className="before_modified_content";
@@ -397,7 +396,7 @@
             new_content_id.value = content_id;
 
 
-            //일자별 원래 일정 따로 저장
+            //일자별 원래 일정 따로 저장(submit할 때 보냄)
             var now_screen_year = document.createElement("input");
             now_screen_year.type = "hidden";
             now_screen_year.name = "now_screen_year";
@@ -422,7 +421,8 @@
             new_time_p.innerHTML = schedule_time;
 
             // 로그인한 계정의 일정일 경우
-            if(<%=if_owner%>){
+            var if_owner = <%=if_owner%>;
+            if(if_owner){
 
                 // 수정날짜, 수정 시간 input form
                 var new_modify_date_input = document.createElement("input");
@@ -536,7 +536,7 @@
 
             // 원래의 일정 내용 출력, 수정 불가 처리
             text_space = document.getElementsByClassName("schedule_content_text")[idx];
-            text_space.value = content;
+            text_space.value = content; 
             text_space.setAttribute("disabled", true);
 
             // 취소선 처리
@@ -548,12 +548,15 @@
 
         //본인 계정의 일정이 아닐 경우 일정 추가란 없애기
         function if_another_user_schedule(){
-            if(!(<%=if_owner%>)){
+            var if_owner = <%=if_owner%>
+            if(!if_owner){
                 document.getElementsByTagName("section")[0].style.display = "none";
                 document.getElementsByTagName("header")[0].style.marginBottom = "50px";
             }
         }
 
+
+        // 위로 올리자
         window.onload=function(){
             make_screen(); // 화면 제작
             make_members_menu(); // 회원 메뉴 제작

@@ -41,8 +41,8 @@
     <script>
 
         function login_check(){
-
-            if(<%=logged_success%>){
+            var logged_success = <%=logged_success%>
+            if(logged_success){
                 
                 var today = new Date();
                 var year = today.getFullYear();

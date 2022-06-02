@@ -25,18 +25,18 @@
         screen_month = String.valueOf(now.getMonth());
     }
 
-
+    // 권한이 있는 사람이 삭제했는지 체크
     String schedule_id = request.getParameter("schedule_id");
 
     Class.forName("com.mysql.jdbc.Driver");
     Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/calender","Stageus","8366");
 
-    // 권한이 있는 사람이 삭제했는지 체크
     String user_sql = "SELECT user_id FROM schedule WHERE schedule_id = ?";
     PreparedStatement user_query = connect.prepareStatement(user_sql);
     user_query.setString(1, schedule_id);
-
     ResultSet result = user_query.executeQuery();
+    // 위에는 필요없을듯
+    
     if(result.next()){
         if(!(logged_id.equals(result.getString(1)))){ 
             response.sendRedirect("./no_auth_alert_page.jsp");

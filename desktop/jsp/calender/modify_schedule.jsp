@@ -48,6 +48,9 @@
         modify_success = false;
     }
 
+    // if안에 if를 넣는 방식으로.
+    // 속도 면에서.
+
     if(modify_success){
         String datetime = date + " " + time;
 
