@@ -29,3 +29,23 @@ HTML 코드 보기가 있음. 지금까지 작성한 것들이 코드로 보임.
 <!-- a 태그 -->
 <!-- []: 출력문구, (): 사이트 주소-->
 [스테이지어스 홈페이지](https://stageus.co.kr)
+
+<!-- img -->
+<!-- []: 없을 시 내용, (): 이미지 주소 -->
+![엑스 박스](https://www.stageus.co.kr/img/stageus_logo_white.png)
+
+![엑스 박스](/source/member_menu.png)
+
+<!-- code 태그 -->
+```html
+<div>
+    <p>Hello world
+</div>
+```
+
+```c++
+
+   int main(){
+       return 0;
+   } 
+```
